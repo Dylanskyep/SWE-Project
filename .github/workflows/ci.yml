@@ -31,7 +31,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Run tests
-      - run: pytest || echo "No tests to run"
+        run: pytest || echo "No tests to run"
 
       # Runs a set of commands using the runners shell
       # - name: Run a multi-line script
