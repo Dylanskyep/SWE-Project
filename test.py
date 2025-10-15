@@ -45,3 +45,11 @@ if success:
     print("Admin login successful (should not happen!)", info)
 else:
     print("Admin login failed as expected:", info)
+
+
+# Create an 'events' node with a placeholder child
+db.child("events").push({
+    "dummy": True
+})
+
+print("Events node created!")

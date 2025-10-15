@@ -98,3 +98,25 @@ if st.session_state.page == "welcome":
         """,
         unsafe_allow_html=True,
     )
+if st.session_state.page == "adminlogin":
+    st.markdown("<h2 style='text-align:center;'>Admin Login</h2>", unsafe_allow_html=True)
+
+    # Create three columns: left spacer, main column, right spacer
+    col1, col2 = st.columns([2.5, 2.5])
+
+    with col2:
+        email = st.text_input("Email")
+        password = st.text_input("Password", type="password")
+        admin_key = st.text_input("Admin Key")
+        
+        login_btn = st.button("Login as Admin")
+
+        # Add blurp next to the button
+        st.markdown("""
+            <div style='display:flex; align-items:center; gap:10px; margin-top:5px;'>
+                <span style='font-size:0.9rem; color:#333;'>Don't have an admin key? Reach out to our team at 
+                    <a href='mailto:admin@ivolunteer.org' style='color:#FFD700;'>admin@ivolunteer.org</a>
+                    and get verified as an admin today!
+                </span>
+            </div>
+        """, unsafe_allow_html=True)
