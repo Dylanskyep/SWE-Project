@@ -98,3 +98,68 @@ if st.session_state.page == "welcome":
         """,
         unsafe_allow_html=True,
     )
+    
+if st.session_state.page == "userlogin":
+    st.markdown("""
+        <style>
+        [data-testid="stAppViewContainer"] {
+                color: rgb(138, 156, 140);
+                background-color: rgb(244, 247, 246);
+                }
+        .title {
+            font-size: 50px;
+            color: rgb(95, 105, 96)!important;
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 4px solid rgb(75, 82, 76);
+            width: 0;
+            animation: 
+                typing 3s steps(23, end) forwards, 
+                blink-fade 0.7s 3s 3 forwards;  
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 17.5ch; }
+        }
+
+        @keyframes blink {
+            50% { border-color: transparent }
+        } 
+                
+         @keyframes blink-fade {
+            0%, 50%, 100% { border-color: rgb(75, 82, 76); } 
+            75%, 100% { border-color: transparent; }
+        }
+                
+        </style>
+    
+        <div class="title">User Login / Sign-Up</div>
+    """, unsafe_allow_html=True)
+    
+    st.set_page_config(layout="wide")
+    left, right = st.columns(2)
+    with left:
+        st.header("Login")
+        username = st.text_input("Username", key="login_username")
+        password = st.text_input("Password", type="password", key="login_password")
+        if st.button("Login"):
+            if username == "user" and password == "password":
+                st.success("Login successful!")
+                st.session_state.page = "userdashboard"
+                st.experimental_rerun()
+            else:
+                st.error("Invalid username or password")
+
+    with right:
+        st.header("Signup")
+        name = st.text_input("Name", key="name")
+        username = st.text_input("Username", key="signup_username")
+        password = st.text_input("Password", type="password", key="signup_password")
+        if st.button("Sign Up"):
+            st.success("Sign Up successful! Please login.")
+            st.session_state.page = "userlogin"
+            
+
+        
+    
