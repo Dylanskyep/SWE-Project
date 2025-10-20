@@ -1,4 +1,5 @@
 import streamlit as st
+from utils import auth as auth_utils
 
 st.set_page_config(layout="wide", initial_sidebar_state="collapsed")
 
@@ -10,6 +11,12 @@ if "admin" in params:
     st.session_state.page = "adminlogin"
 if "user" in params:
     st.session_state.page = "userlogin"
+if "page" in params:
+    page = params["page"]
+    if page == "user_dashboard":
+        st.switch_page("pages/User_Dashboard.py")
+    elif page == "admin_dashboard":
+        st.switch_page("pages/Admin_Dashboard.py")
 
 if st.session_state.page == "welcome":
     st.markdown(
@@ -140,24 +147,38 @@ if st.session_state.page == "userlogin":
     left, right = st.columns(2)
     with left:
         st.header("Login")
-        email = st.text_input("Email", key="login_email")
-        password = st.text_input("Password", type="password", key="login_password")
+        email = st.text_input("Email", key="user_login_email")
+        password = st.text_input("Password", type="password", key="user_login_password")
         if st.button("Login"):
-            if email == "email" and password == "password":
-                st.success("Login successful!")
-                st.session_state.page = "userdashboard"
-                st.experimental_rerun()
+            if not email or not password:
+                st.error("Please enter both email and password")
             else:
-                st.error("Invalid email or password")
-
+                user = auth_utils.login_user(email, password)
+                if user:
+                    st.success("Login successful!")
+                    st.session_state.user_email = email
+                    st.session_state.user_password = password
+                    st.session_state.user_role = "volunteer"
+                    st.session_state.userid = "user_id"
+                if st.session_state.user_role == "volunteer":
+                    st.success("Login successful! Redirecting to Volunteer Dashboard...")
+                    st.query_params.update({"page": "user_dashboard"})
+                    st.rerun()
+                    
     with right:
         st.header("Sign Up")
         name = st.text_input("Name", key="name")
-        username = st.text_input("Email", key="signup_email")
-        password = st.text_input("Password", type="password", key="signup_password")
+        email = st.text_input("Email", key="user_signup_email")
+        password = st.text_input("Password", type="password", key="user_signup_password")
         if st.button("Sign Up"):
-            st.success("Sign Up successful! Please login.")
-            st.session_state.page = "userlogin"
+            if not email or not password or not name:
+                st.error("Please fill in all fields")
+            else:
+                user = auth_utils.create_volunteer(name, email, password)
+                if not user:
+                    st.error("Email already registered")
+                else:
+                    st.success("Sign Up successful! Please login.")
             
 if st.session_state.page == "adminlogin":
     st.markdown("""
@@ -201,28 +222,38 @@ if st.session_state.page == "adminlogin":
     left, right = st.columns(2)
     with left:
         st.header("Login")
-        email = st.text_input("Email", key="login_email")
-        password = st.text_input("Password", type="password", key="login_password")
+        email = st.text_input("Email", key="admin_login_email")
+        password = st.text_input("Password", type="password", key="admin_login_password")
         if st.button("Login"):
-            if username == "user" and password == "password":
-                st.success("Login successful!")
-                st.session_state.page = "userdashboard"
-                st.experimental_rerun()
+            if not email or not password:
+                st.error("Please enter both email and password")
             else:
-                st.error("Invalid username or password")
+                admin = auth_utils.login_user(email, password)
+                if admin:
+                    st.success("Login successful!")
+                    st.session_state.user_email = email
+                    st.session_state.user_password = password
+                    st.session_state.user_role = "admin"
+                    st.session_state.userid = "user_id"
+                if st.session_state.user_role == "admin":
+                    st.query_params.update({"page": "admin_dashboard"})
+                    st.rerun()
+        else:
+            st.error("Invalid username or password")
 
     with right:
         st.header("Sign Up")
         name = st.text_input("Name", key="name")
-        email = st.text_input("Email", key="signup_email")
-        password = st.text_input("Password", type="password", key="signup_password")
+        email = st.text_input("Email", key="admin_signup_email")
+        password = st.text_input("Password", type="password", key="admin_signup_password")
         adminkey = st.text_input("Admin Key", type="password", key="adminkey")
         if st.button("Sign Up"):
-            st.success("Sign Up successful! Please login.")
-            st.session_state.page = "userlogin"
-            
+            if not email or not password or not name or not adminkey:
+                st.error("Please fill in all fields")
+            else:
+                admin = auth_utils.create_admin(name, email, password, adminkey)
+                if not admin:
+                    st.error("Email already registered")
+                else:
+                    st.success("Sign Up successful! Please login.")
 
-        
-    
-        
-    
