@@ -238,8 +238,6 @@ if st.session_state.page == "adminlogin":
                 if st.session_state.user_role == "admin":
                     st.query_params.update({"page": "admin_dashboard"})
                     st.rerun()
-        else:
-            st.error("Invalid username or password")
 
     with right:
         st.header("Sign Up")
