@@ -2,7 +2,6 @@ import streamlit as st
 
 st.set_page_config(layout="wide", initial_sidebar_state="collapsed")
 
-# Session state
 if "page" not in st.session_state:
     st.session_state.page = "welcome"
 
@@ -98,30 +97,6 @@ if st.session_state.page == "welcome":
         """,
         unsafe_allow_html=True,
     )
-<<<<<<< HEAD
-if st.session_state.page == "adminlogin":
-    st.markdown("<h2 style='text-align:center;'>Admin Login</h2>", unsafe_allow_html=True)
-
-    # Create three columns: left spacer, main column, right spacer
-    col1, col2 = st.columns([2.5, 2.5])
-
-    with col2:
-        email = st.text_input("Email")
-        password = st.text_input("Password", type="password")
-        admin_key = st.text_input("Admin Key")
-        
-        login_btn = st.button("Login as Admin")
-
-        # Add blurp next to the button
-        st.markdown("""
-            <div style='display:flex; align-items:center; gap:10px; margin-top:5px;'>
-                <span style='font-size:0.9rem; color:#333;'>Don't have an admin key? Reach out to our team at 
-                    <a href='mailto:admin@ivolunteer.org' style='color:#FFD700;'>admin@ivolunteer.org</a>
-                    and get verified as an admin today!
-                </span>
-            </div>
-        """, unsafe_allow_html=True)
-=======
     
 if st.session_state.page == "userlogin":
     st.markdown("""
@@ -165,7 +140,68 @@ if st.session_state.page == "userlogin":
     left, right = st.columns(2)
     with left:
         st.header("Login")
-        username = st.text_input("Username", key="login_username")
+        email = st.text_input("Email", key="login_email")
+        password = st.text_input("Password", type="password", key="login_password")
+        if st.button("Login"):
+            if email == "email" and password == "password":
+                st.success("Login successful!")
+                st.session_state.page = "userdashboard"
+                st.experimental_rerun()
+            else:
+                st.error("Invalid email or password")
+
+    with right:
+        st.header("Sign Up")
+        name = st.text_input("Name", key="name")
+        username = st.text_input("Email", key="signup_email")
+        password = st.text_input("Password", type="password", key="signup_password")
+        if st.button("Sign Up"):
+            st.success("Sign Up successful! Please login.")
+            st.session_state.page = "userlogin"
+            
+if st.session_state.page == "adminlogin":
+    st.markdown("""
+        <style>
+        [data-testid="stAppViewContainer"] {
+                color: rgb(138, 156, 140);
+                background-color: rgb(244, 247, 246);
+                }
+        .title {
+            font-size: 50px;
+            color: rgb(95, 105, 96)!important;
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 4px solid rgb(75, 82, 76);
+            width: 0;
+            animation: 
+                typing 3s steps(23, end) forwards, 
+                blink-fade 0.7s 3s 3 forwards;  
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 19.5ch; }
+        }
+
+        @keyframes blink {
+            50% { border-color: transparent }
+        } 
+                
+         @keyframes blink-fade {
+            0%, 50%, 100% { border-color: rgb(75, 82, 76); } 
+            75%, 100% { border-color: transparent; }
+        }
+                
+        </style>
+    
+        <div class="title">Admin Login / Sign-Up</div>
+    """, unsafe_allow_html=True)
+    
+    st.set_page_config(layout="wide")
+    left, right = st.columns(2)
+    with left:
+        st.header("Login")
+        email = st.text_input("Email", key="login_email")
         password = st.text_input("Password", type="password", key="login_password")
         if st.button("Login"):
             if username == "user" and password == "password":
@@ -176,15 +212,11 @@ if st.session_state.page == "userlogin":
                 st.error("Invalid username or password")
 
     with right:
-        st.header("Signup")
+        st.header("Sign Up")
         name = st.text_input("Name", key="name")
-        username = st.text_input("Username", key="signup_username")
+        email = st.text_input("Email", key="signup_email")
         password = st.text_input("Password", type="password", key="signup_password")
+        adminkey = st.text_input("Admin Key", type="password", key="adminkey")
         if st.button("Sign Up"):
             st.success("Sign Up successful! Please login.")
             st.session_state.page = "userlogin"
-            
-
-        
-    
->>>>>>> f514779650fcce36e0a1962bd55c09326138d9ec
