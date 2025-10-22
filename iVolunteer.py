@@ -153,14 +153,14 @@ if st.session_state.page == "userlogin":
             if not email or not password:
                 st.error("Please enter both email and password")
             else:
-                user = auth_utils.login_user(email, password)
+                user = auth_utils.login_user(email, password, role="volunteer")
                 if user:
                     st.success("Login successful!")
                     st.session_state.user_email = email
                     st.session_state.user_password = password
-                    st.session_state.user_role = "volunteer"
                     st.session_state.userid = "user_id"
-                if st.session_state.user_role == "volunteer":
+                    st.session_state.role = user.get("role", "volunteer")
+                if st.session_state.get("role") == "volunteer":
                     st.success("Login successful! Redirecting to Volunteer Dashboard...")
                     st.query_params.update({"page": "user_dashboard"})
                     st.rerun()
@@ -174,11 +174,11 @@ if st.session_state.page == "userlogin":
             if not email or not password or not name:
                 st.error("Please fill in all fields")
             else:
-                user = auth_utils.create_volunteer(name, email, password)
+                user, msg = auth_utils.create_volunteer(name, email, password)
                 if not user:
-                    st.error("Email already registered")
+                    st.error(msg)
                 else:
-                    st.success("Sign Up successful! Please login.")
+                    st.success(msg)
             
 if st.session_state.page == "adminlogin":
     st.markdown("""
@@ -228,14 +228,14 @@ if st.session_state.page == "adminlogin":
             if not email or not password:
                 st.error("Please enter both email and password")
             else:
-                admin = auth_utils.login_user(email, password)
+                admin = auth_utils.login_user(email, password, role="admin")
                 if admin:
                     st.success("Login successful!")
                     st.session_state.user_email = email
                     st.session_state.user_password = password
-                    st.session_state.user_role = "admin"
                     st.session_state.userid = "user_id"
-                if st.session_state.user_role == "admin":
+                    st.session_state.role = admin.get("role", "admin")
+                if st.session_state.get("role") == "admin":
                     st.query_params.update({"page": "admin_dashboard"})
                     st.rerun()
 
@@ -249,9 +249,9 @@ if st.session_state.page == "adminlogin":
             if not email or not password or not name or not adminkey:
                 st.error("Please fill in all fields")
             else:
-                admin = auth_utils.create_admin(name, email, password, adminkey)
+                admin, msg = auth_utils.create_admin(name, email, password, adminkey)
                 if not admin:
-                    st.error("Email already registered")
+                    st.error(msg)
                 else:
-                    st.success("Sign Up successful! Please login.")
+                    st.success(msg)
 

@@ -22,19 +22,33 @@ def create_user(name: str, email: str, password: str, role: str, admin_key: str 
     })
     return True, "User created successfully"
 
-def login_user(email: str, password: str):
+def login_user(email: str, password: str, role: str = None):
+    """
+    Return user dict on successful login or None on failure
+    If role is provided, require the user to have that role.
+    This keeps the front-end 'if user:' checks working unchanged.
+    """
     users_ref = db.collection("users")
-    docs = users_ref.where("email", "==", email.lower()).stream()
+    query = users_ref.where("email", "==", email.lower())
+    if role:
+        query = query.where("role", "==", role)
+
+    docs = list(query.stream())
+    if not docs:
+        return None
+
     for doc in docs:
         user = doc.to_dict()
-        if user["password"] == hash_password(password):
-            return True, {
+        if user.get("password") == hash_password(password):
+            return {
                 "user_id": doc.id,
-                "name": user["name"],
-                "email": user["email"],
-                "role": user["role"]
+                "name": user.get("name"),
+                "email": user.get("email"),
+                "role": user.get("role")
             }
-    return False, "Invalid email or password"
+
+    # Password didn't match any found account
+    return None
 
 def create_volunteer(name, email, password):
     return create_user(name, email, password, role="volunteer")

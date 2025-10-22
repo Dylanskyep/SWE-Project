@@ -1,7 +1,7 @@
 import streamlit as st
 
 
-if "user_role" not in st.session_state or st.session_state.user_role != "volunteer":
+if "role" not in st.session_state or st.session_state.role != "volunteer":
     st.error("Unauthorized access. Please log in as a volunteer.")
     st.stop()
 
