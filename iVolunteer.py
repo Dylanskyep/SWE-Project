@@ -167,7 +167,7 @@ if st.session_state.page == "userlogin":
                     
     with right:
         st.header("Sign Up")
-        name = st.text_input("Name", key="name")
+        name = st.text_input("Name (first and last)", key="name")
         email = st.text_input("Email", key="user_signup_email")
         password = st.text_input("Password", type="password", key="user_signup_password")
         if st.button("Sign Up"):
@@ -241,7 +241,7 @@ if st.session_state.page == "adminlogin":
 
     with right:
         st.header("Sign Up")
-        name = st.text_input("Name", key="name")
+        name = st.text_input("Name (first and last)", key="name")
         email = st.text_input("Email", key="admin_signup_email")
         password = st.text_input("Password", type="password", key="admin_signup_password")
         adminkey = st.text_input("Admin Key", type="password", key="adminkey")

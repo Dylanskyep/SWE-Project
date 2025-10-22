@@ -11,3 +11,4 @@ st.write(f"Welcome, {st.session_state.user_email}!")
 if st.button("Logout"):
     st.session_state.clear()
     st.session_state.page = "welcome"
+    st.rerun()
