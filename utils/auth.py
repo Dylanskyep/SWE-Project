@@ -1,12 +1,21 @@
 import hashlib
+import re
 from utils.db import db
 
 def hash_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
 
+EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
+def valid_email(email: str) -> bool:
+    return bool(EMAIL_RE.match(email.strip()))
+
 ADMIN_KEY = "admin123"  # replace later or move to env variable
 
 def create_user(name: str, email: str, password: str, role: str, admin_key: str = None):
+    email = email.strip().lower()
+    if not valid_email(email):
+        return False, "Invalid email format"
     users_ref = db.collection("users")
     existing = users_ref.where("email", "==", email.lower()).stream()
     if any(existing):
