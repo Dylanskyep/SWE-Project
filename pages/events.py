@@ -18,11 +18,13 @@ else:
 
             col1, col2 = st.columns(2)
             with col1:
-                if st.button("View Details", key=f"open_{event_id}"):
+                if st.button("View Details", key=f"details_{event_id}"):
                     st.query_params["eid"] = event_id
-                    try:
-                        st.switch_page("pages/event_detail.py")
-                    except Exception:
-                        st.info("Open the 'Event Detail' page from the sidebar.")
+                    st.switch_page("pages/event_detail.py")
+
+                    # try:
+                    #     st.switch_page("pages/event_detail.py")
+                    # except Exception:
+                    #     st.info("Open the 'Event Detail' page from the sidebar.")
             # with col2:
             #     st.caption(f"Event ID: `{event_id}`")

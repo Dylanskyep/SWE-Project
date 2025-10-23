@@ -1,7 +1,7 @@
 from typing import List, Dict, Optional, Tuple
 from datetime import datetime
 from google.cloud import firestore
-from .firebase_config import get_db
+from services.firebase_config import get_db
 from datetime import datetime
 
 
@@ -41,12 +41,24 @@ def get_upcoming_events():
     snaps = query.stream()
     return [(s.id, s.to_dict() or {}) for s in snaps]
     
-def get_event(event_id: str) -> Optional[Dict]:
-    snap = _events_col().document(event_id).get()
-    if snap.exists:
-        return snap.to_dict()
-    else:
+def get_event(event_id):
+    if not event_id:
         return None
+    
+    try:
+        db = get_db()
+        doc_ref = db.collection("events").document(event_id)
+        doc = doc_ref.get()
+
+        if doc.exists:
+            return doc.to_dict()
+        else:
+            print(f"[DEBUG] Event with ID {event_id} not found in Firestore.")
+            return None
+    except Exception as e:
+        print(f"[ERROR] An error occurred while fetching event: {e}")
+        return None
+
     
 def update_event(event_id, data):
     event_ref = _events_col().document(event_id)
