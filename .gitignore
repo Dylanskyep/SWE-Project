@@ -3,8 +3,4 @@ __pycache__/
 *.pyc
 .env
 .DS_Store
-<<<<<<< HEAD
-serviceAccountKey.json
-=======
 firebase_config.json
->>>>>>> 92049d49b76aef4d0903c2b996d9953e69a4ccc2
