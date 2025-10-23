@@ -17,6 +17,9 @@ if "page" in params:
         st.switch_page("pages/User_Dashboard.py")
     elif page == "admin_dashboard":
         st.switch_page("pages/Admin_Dashboard.py")
+if st.session_state.get("logout_redirect"):
+    st.session_state.page = "welcome"
+    del st.session_state["logout_redirect"]
 
 if st.session_state.page == "welcome":
     st.markdown(

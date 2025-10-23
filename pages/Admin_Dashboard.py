@@ -1,7 +1,7 @@
 import streamlit as st
 
 if "role" not in st.session_state or st.session_state.role != "admin":
-    st.error("Unauthorized access. Please log in as an admin.")
+    st.error("Unauthorized access. Please navigate back to the iVolunteer login page in using the top left navigation menu.")
     st.stop()
     
 st.title("Admin Dashboard")
