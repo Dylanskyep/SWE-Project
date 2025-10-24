@@ -82,7 +82,8 @@ else:
                 try:
                     register_user(event_id, user_id, user_name, user_email)
                     st.success(f"You have registered for **{ev['title']}**!")
-                    st.rerun()
+                except ValueError as e:
+                    st.warning(str(e))
                 except Exception as e:
                     st.error(f"Error registering: {e}")
         else:

@@ -82,7 +82,7 @@ def register_user(event_id: str, user_id: str, name: str, email: str) -> None:
     """Register a user and decrement capacity atomically."""
     db = get_db()
     tx = db.transaction()
-    _register_tx(tx, event_id, user_id, name, email)  # runs inside the transaction
+    _register_tx(tx, event_id, user_id, name, email)
 
 
 @firestore.transactional
@@ -99,7 +99,7 @@ def _register_tx(transaction, event_id: str, user_id: str, name: str, email: str
     reg_ref = event_ref.collection("registrations").document(user_id)
     reg_snap = reg_ref.get(transaction=transaction)
     if reg_snap.exists:
-        return
+        raise ValueError("User is already registered for this event.")
 
     reg_data = {"user_id": user_id, "name": name, "email": email}
     transaction.set(reg_ref, reg_data)
