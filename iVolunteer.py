@@ -245,6 +245,7 @@ if st.session_state.page == "adminlogin":
         email = st.text_input("Email", key="admin_signup_email")
         password = st.text_input("Password", type="password", key="admin_signup_password")
         adminkey = st.text_input("Admin Key", type="password", key="adminkey")
+        st.caption("Don't have an admin key? Contact the development team to request one.")
         if st.button("Sign Up"):
             if not email or not password or not name or not adminkey:
                 st.error("Please fill in all fields")

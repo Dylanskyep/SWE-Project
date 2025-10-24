@@ -14,7 +14,6 @@ def _today_iso() -> str:
 """Events CRUD Operations"""
 
 def create_event(data: dict):
-    #required fields
     events_ref = _events_col()
     new_event = {
         "title": data.get("title", "Untitled Event"),
@@ -23,6 +22,8 @@ def create_event(data: dict):
         "time": data.get("time", "00:00"),
         "location": data.get("location", "TBD"),
         "capacity": int(data.get("capacity", 0)),
+        "created_by": data.get("created_by", ""),
+        "created_at": datetime.now().isoformat(),
     }
 
     ref = events_ref.document()
@@ -118,3 +119,15 @@ def list_user_registrations(user_id: str):
             user_events.append(event_data)
     user_events.sort(key=lambda e: (e.get("date", ""), e.get("time", "")))
     return user_events
+
+def list_admin_events(admin_id: str):
+    db = get_db()
+    query = db.collection("events").where("created_by", "==", admin_id)
+    snaps = query.stream()
+    admin_events = []
+    for doc in snaps:
+        data = doc.to_dict()
+        data["event_id"] = doc.id
+        admin_events.append(data)
+    admin_events.sort(key=lambda e: (e.get("date", ""), e.get("time", "")))
+    return admin_events
