@@ -78,34 +78,43 @@ def list_registrations(event_id: str) -> List[Dict]:
     )
     return [r.to_dict() or {} for r in regs]
 
-@firestore.transactional
-def register_user(event_id: str, user_id:str, name:str, email:str) -> None:
-    """Register a user and decrement capacity"""
+def register_user(event_id: str, user_id: str, name: str, email: str) -> None:
+    """Register a user and decrement capacity atomically."""
     db = get_db()
     tx = db.transaction()
-    _register_tx(tx, event_id, user_id, name, email)
+    _register_tx(tx, event_id, user_id, name, email)  # runs inside the transaction
 
-def _register_tx(tx, event_id: str, user_id:str, name:str, email:str):
+
+@firestore.transactional
+def _register_tx(transaction, event_id: str, user_id: str, name: str, email: str):
     event_ref = _events_col().document(event_id)
-    event_snap = event_ref.get(transaction=tx)
+    event_snap = event_ref.get(transaction=transaction)
     if not event_snap.exists:
         raise ValueError("Event does not exist.")
+
     event_data = event_snap.to_dict() or {}
     capacity = int(event_data.get("capacity", 0))
     if capacity <= 0:
         raise ValueError("Event is full.")
-    
     reg_ref = event_ref.collection("registrations").document(user_id)
-    reg_snap = reg_ref.get(transaction=tx)
+    reg_snap = reg_ref.get(transaction=transaction)
     if reg_snap.exists:
-        return    
-    # Add registration
-    reg_data = {
-        "user_id": user_id,
-        "name": name,
-        "email": email,
-    }
-    tx.set(reg_ref, reg_data)
-    
-    # Decrement capacity
-    tx.update(event_ref, {"capacity": capacity - 1})
+        return
+
+    reg_data = {"user_id": user_id, "name": name, "email": email}
+    transaction.set(reg_ref, reg_data)
+    transaction.update(event_ref, {"capacity": capacity - 1})
+
+def list_user_registrations(user_id: str):
+    db = get_db()
+    events_ref = db.collection("events")
+    user_events = []
+    for event_doc in events_ref.stream():
+        event_data = event_doc.to_dict()
+        reg_ref = event_doc.reference.collection("registrations").document(user_id)
+        reg = reg_ref.get()
+        if reg.exists:
+            event_data["event_id"] = event_doc.id
+            user_events.append(event_data)
+    user_events.sort(key=lambda e: (e.get("date", ""), e.get("time", "")))
+    return user_events
