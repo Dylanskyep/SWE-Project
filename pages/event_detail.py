@@ -10,7 +10,7 @@ if st.button("⬅ Back to Events"):
     st.switch_page("pages/events.py")
 
 query_params = st.query_params
-event_id = query_params.get("eid")
+event_id = query_params.get("eid", [None])[0]
 
 st.caption(f"🔍 DEBUG: Loaded event_id = {event_id}")
 
