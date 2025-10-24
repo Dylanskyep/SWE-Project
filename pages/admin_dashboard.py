@@ -1,4 +1,8 @@
 import streamlit as st
+from services.event_service import (
+    get_upcoming_events, get_event, create_event, update_event, delete_event, list_registrations
+)
+from datetime import datetime, date, time
 
 if "role" not in st.session_state or st.session_state.role != "admin":
     st.error("Unauthorized access. Please log in as an admin.")
@@ -12,16 +16,8 @@ if st.button("Logout"):
     st.session_state.page = "welcome"
 
 
-import streamlit as st
-from services.event_service import (
-    get_upcoming_events, get_event, create_event, update_event, delete_event, list_registrations
-)
-from datetime import datetime, date, time
+st.title("Events")
 
-# st.set_page_config(page_title="Admin Dashboard", page_icon="🛠️")
-st.title("Admin - Events")
-
-# st.info("Hook actual admin auth later; this page assumes you are an admin.")
 
 """Create Event"""
 with st.form("event_form", clear_on_submit=True):
@@ -102,8 +98,17 @@ else:
                     new_time_str = event.get("time", "")
 
                     new_date = st.date_input("Date", value=datetime.strptime(new_date_str, "%Y-%m-%d").date() if new_date_str else date.today())
-                    new_time = st.time_input("Time", value=datetime.strptime(new_time_str, "%H:%M").time() if new_time_str else time(0, 0))
+                    #new_time = st.time_input("Time", value=datetime.strptime(new_time_str, "%H:%M").time() if new_time_str else time(0, 0))
                     
+                    try:
+                        if "A.M." in new_time_str or "P.M." in new_time_str:
+                            new_time_value = datetime.strptime(new_time_str.replace("A.M.", "AM").replace("P.M.", "PM"), "%I:%M %p").time()
+                        else:
+                            new_time_value = datetime.strptime(new_time_str, "%H:%M").time()
+                    except Exception:
+                        new_time_value = time(0, 0)
+
+                    new_time = st.time_input("Time", value=new_time_value)
                     new_location = st.text_input("Location", value=event.get("location", ""))
                     new_capacity = st.number_input("Capacity", min_value=1, step=1, value=int(event.get("capacity", 1)))
 
@@ -116,6 +121,7 @@ else:
                     # with col2:
                     #     time = st.text_input("Time (HH:MM)", value=event.get("time", ""))
                     #     capacity = st.number_input("Capacity", min_value=0, step=1, value=int(event.get("capacity", 0)))
+                    
                     colA, colB = st.columns(2)
                     with colA:
                         updated = st.form_submit_button("Update Event")
