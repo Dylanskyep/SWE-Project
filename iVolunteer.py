@@ -1,4 +1,5 @@
 import streamlit as st
+import time
 from utils import auth as auth_utils
 
 st.set_page_config(layout="wide", initial_sidebar_state="collapsed")
@@ -162,8 +163,10 @@ if st.session_state.page == "userlogin":
                     st.session_state.role = user.get("role", "volunteer")
                 if st.session_state.get("role") == "volunteer":
                     st.success("Login successful! Redirecting to Volunteer Dashboard...")
-                    st.query_params.update({"page": "user_dashboard"})
-                    st.rerun()
+                    # st.query_params.update({"page": "user_dashboard"})
+                    # st.rerun()
+                    time.sleep(1)
+                    st.switch_page("pages/user_dashboard.py")
                     
     with right:
         st.header("Sign Up")
@@ -236,8 +239,10 @@ if st.session_state.page == "adminlogin":
                     st.session_state.userid = "user_id"
                     st.session_state.role = admin.get("role", "admin")
                 if st.session_state.get("role") == "admin":
-                    st.query_params.update({"page": "admin_dashboard"})
-                    st.rerun()
+                    # st.query_params.update({"page": "admin_dashboard"})
+                    # st.rerun()
+                    time.sleep(1)
+                    st.switch_page("pages/admin_dashboard.py")
 
     with right:
         st.header("Sign Up")
