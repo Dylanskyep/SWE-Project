@@ -9,6 +9,7 @@ from services.event_service import (
 )
 
 if "role" not in st.session_state or st.session_state.role != "admin":
+    st.error("Unauthorized access. Please log in as an admin.")
     try:
         st.query_params()
     except Exception:
@@ -145,6 +146,8 @@ with header_left:
 with header_right:
     if st.button("Logout"):
         st.session_state.clear()
+        st.session_state.page = "welcome"
+        st.rerun()
         try:
             st.query_params()
         except Exception:
@@ -157,6 +160,44 @@ with header_right:
 
 st.markdown('<div class="header-divider"></div>', unsafe_allow_html=True)
 st.markdown('<div class="section-header">Create New Event</div>', unsafe_allow_html=True)
+
+# Helper functions for time parsing/formatting
+def parse_stored_time_to_timeobj(stored_time: str):
+    """
+    Accepts a stored time string that may be:
+      - "HH:MM" (24-hour)
+      - "H:MM AM/PM" or "HH:MM AM/PM"
+    Returns a datetime.time object, or None on failure.
+    """
+    if not stored_time:
+        return None
+    s = stored_time.strip().replace(".", "")
+    try:
+        # Try AM/PM first
+        if "AM" in s.upper() or "PM" in s.upper():
+            return datetime.strptime(s.upper(), "%I:%M %p").time()
+        # Fall back to 24-hour
+        return datetime.strptime(s, "%H:%M").time()
+    except Exception:
+        return None
+
+def format_time_for_display(stored_time: str):
+    """
+    Returns a time string in "HH:MM AM/PM" for display.
+    Accepts stored_time in either "%H:%M" or "%I:%M %p".
+    If parsing fails, returns the original string.
+    """
+    if not stored_time:
+        return ""
+    s = stored_time.strip().replace(".", "")
+    try:
+        if "AM" in s.upper() or "PM" in s.upper():
+            # Already in AM/PM — normalize spacing and case
+            return datetime.strptime(s.upper(), "%I:%M %p").strftime("%I:%M %p")
+        # Try parsing as 24-hour and convert
+        return datetime.strptime(s, "%H:%M").strftime("%I:%M %p")
+    except Exception:
+        return stored_time
 
 with st.form("event_form", clear_on_submit=True):
     title = st.text_input("Event Title")
@@ -187,7 +228,8 @@ with st.form("event_form", clear_on_submit=True):
             st.error("Please fix the following issues:\n- " + "\n- ".join(errors))
         else:
             formatted_date = date_.strftime("%Y-%m-%d")
-            formatted_time = time_.strftime("%H:%M")
+            # Save time in 12-hour AM/PM string format for user-friendly display
+            formatted_time = time_.strftime("%I:%M %p")
 
             create_event({
                 "title": title,
@@ -208,10 +250,12 @@ if not events:
     st.caption("No upcoming events.")
 else:
     for event_id, event in events:
+        # Display time in 12-hour AM/PM format (convert if stored as 24-hour)
+        stored_display_time = format_time_for_display(event.get("time", ""))
         st.markdown(f"""
         <div class="event-card">
             <h4>{event.get('title', 'Untitled')}</h4>
-            <p><b>Date:</b> {event.get('date', 'TBD')} at {event.get('time', '')}</p>
+            <p><b>Date:</b> {event.get('date', 'TBD')} at {stored_display_time}</p>
             <p><b>Location:</b> {event.get('location', 'TBD')}</p>
             <p><b>Description:</b> {event.get('description', '')}</p>
             <p><b>Capacity:</b> {int(event.get('capacity', 0))}</p>
@@ -239,13 +283,9 @@ else:
                     default_date = date.today()
                 stored_time = event.get("time", "")
                 try:
-                    if "A.M." in stored_time or "P.M." in stored_time:
-                        default_time = datetime.strptime(
-                            stored_time.replace("A.M.", "AM").replace("P.M.", "PM"),
-                            "%I:%M %p"
-                        ).time()
-                    else:
-                        default_time = datetime.strptime(stored_time, "%H:%M").time()
+                    # Use helper to handle multiple stored formats
+                    parsed = parse_stored_time_to_timeobj(stored_time)
+                    default_time = parsed if parsed is not None else time(0, 0)
                 except Exception:
                     default_time = time(0, 0)
 
@@ -276,7 +316,8 @@ else:
                     st.error("Please fill in all fields before saving.")
                 else:
                     formatted_date = new_date.strftime("%Y-%m-%d")
-                    formatted_time = new_time.strftime("%H:%M")
+                    # Save updates in 12-hour AM/PM form
+                    formatted_time = new_time.strftime("%I:%M %p")
 
                     update_event(
                         event_id,

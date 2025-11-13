@@ -3,6 +3,7 @@ from services.event_service import list_user_registrations
 st.set_page_config(layout="wide")
 
 if "role" not in st.session_state or st.session_state.role != "volunteer":
+    st.error("Unauthorized access. Please log in as a volunteer.")
     try:
         st.query_params()
     except Exception:
@@ -103,6 +104,8 @@ with col1:
 with col2:
     if st.button("Logout"):
         st.session_state.clear()
+        st.session_state.page = "welcome"
+        st.rerun()
         try:
             st.query_params()
         except Exception:
