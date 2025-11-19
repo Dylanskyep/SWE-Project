@@ -120,6 +120,27 @@ def list_user_registrations(user_id: str):
     user_events.sort(key=lambda e: (e.get("date", ""), e.get("time", "")))
     return user_events
 
+def unregister_user(event_id: str, user_id: str) -> None:
+    db = get_db()
+    tx = db.transaction()
+    _unregister_tx(tx, event_id, user_id)
+
+
+@firestore.transactional
+def _unregister_tx(transaction, event_id: str, user_id: str):
+    event_ref = _events_col().document(event_id)
+    event_snap = event_ref.get(transaction=transaction)
+    if not event_snap.exists:
+        raise ValueError("Event does not exist.")
+    reg_ref = event_ref.collection("registrations").document(user_id)
+    reg_snap = reg_ref.get(transaction=transaction)
+    if not reg_snap.exists:
+        raise ValueError("User is not registered for this event.")
+    event_data = event_snap.to_dict() or {}
+    capacity = int(event_data.get("capacity", 0))
+    transaction.delete(reg_ref)
+    transaction.update(event_ref, {"capacity": capacity + 1})
+
 def list_admin_events(admin_id: str):
     db = get_db()
     query = db.collection("events").where("created_by", "==", admin_id)

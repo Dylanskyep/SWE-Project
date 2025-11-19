@@ -1,5 +1,5 @@
 import streamlit as st
-from services.event_service import list_user_registrations  
+from services.event_service import list_user_registrations, unregister_user
 st.set_page_config(layout="wide")
 
 if "role" not in st.session_state or st.session_state.role != "volunteer":
@@ -49,7 +49,7 @@ st.markdown("""
     border-radius: 12px;
     padding: 16px 20px;
     margin: 16px 0;                 
-    box-shadow: 0 4px 16px rgba(0,0,0,0.06); 
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3); 
 }
 .event-card h4 {
     color: rgb(95,105,96);
@@ -70,6 +70,17 @@ st.markdown("""
 .stButton > button:hover {
     background-color: rgb(75,82,76);
 }
+.event-wrapper {
+    max-width: 920px;
+    margin: 12px auto;
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 12px;
+    padding: 12px;
+    background: rgba(255,255,255,0.98);
+}
+.event-wrapper .event-card {
+    margin: 0;
+}
 </style>
 <div class="title">Volunteer Dashboard</div>
 """, unsafe_allow_html=True)
@@ -80,20 +91,36 @@ st.subheader(f"Welcome, {user_name or user_email}!")
 st.subheader("My Upcoming Events")
 
 events = list_user_registrations(user_id)
-
+ 
 if not events:
     st.info("You haven’t signed up for any events yet.")
 else:
     for ev in events:
-        st.markdown(f"""
-        <div class="event-card">
-            <h4>{ev.get('title', 'Untitled Event')}</h4>
-            <p><b>Date:</b> {ev.get('date', 'TBD')} at {ev.get('time', '00:00')}</p>
-            <p><b>Location:</b> {ev.get('location', 'TBD')}</p>
-            <p><b>Description:</b> {ev.get('description', '')}</p>
-        </div>
-        """, unsafe_allow_html=True)
-st.markdown("</div>", unsafe_allow_html=True)
+        event_id = ev.get("event_id")
+        st.markdown('<div class="event-wrapper">', unsafe_allow_html=True)
+        cols = st.columns([9, 1])
+        with cols[0]:
+            st.markdown(f"""
+            <div class="event-card">
+                <h4>{ev.get('title', 'Untitled Event')}</h4>
+                <p><b>Date:</b> {ev.get('date', 'TBD')} at {ev.get('time', '00:00')}</p>
+                <p><b>Location:</b> {ev.get('location', 'TBD')}</p>
+                <p><b>Description:</b> {ev.get('description', '')}</p>
+            </div>
+            """, unsafe_allow_html=True)
+        with cols[1]:
+            st.write("")
+            if event_id:
+                if st.button("Unregister", key=f"unreg_{event_id}"):
+                    try:
+                        unregister_user(event_id, user_id)
+                        st.success(f"You have been unregistered from **{ev.get('title','this event')}**.")
+                        st.rerun()
+                    except ValueError as e:
+                        st.warning(str(e))
+                    except Exception as e:
+                        st.error(f"Error unregistering: {e}")
+        st.markdown('</div>', unsafe_allow_html=True)
 
 st.write("")
 col1, spacer, col2 = st.columns([2, 7, 1])
