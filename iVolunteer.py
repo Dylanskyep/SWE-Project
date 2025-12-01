@@ -156,9 +156,10 @@ if st.session_state.page == "userlogin":
                 user = auth_utils.login_user(email, password, role="volunteer")
                 if user:
                     st.success("Login successful!")
-                    st.session_state.user_email = email
+                    st.session_state.user_email = user.get("email", email)
+                    st.session_state.user_name = user.get("name")
                     st.session_state.user_password = password
-                    st.session_state.userid = "user_id"
+                    st.session_state.userid = user.get("user_id")
                     st.session_state.role = user.get("role", "volunteer")
                 if st.session_state.get("role") == "volunteer":
                     st.success("Login successful! Redirecting to Volunteer Dashboard...")
@@ -231,9 +232,10 @@ if st.session_state.page == "adminlogin":
                 admin = auth_utils.login_user(email, password, role="admin")
                 if admin:
                     st.success("Login successful!")
-                    st.session_state.user_email = email
+                    st.session_state.user_email = admin.get("email", email)
+                    st.session_state.user_name = admin.get("name")
                     st.session_state.user_password = password
-                    st.session_state.userid = "user_id"
+                    st.session_state.userid = admin.get("user_id")
                     st.session_state.role = admin.get("role", "admin")
                 if st.session_state.get("role") == "admin":
                     st.query_params.update({"page": "admin_dashboard"})
