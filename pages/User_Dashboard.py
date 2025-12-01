@@ -97,7 +97,6 @@ if not events:
 else:
     for ev in events:
         event_id = ev.get("event_id")
-        st.markdown('<div class="event-wrapper">', unsafe_allow_html=True)
         cols = st.columns([9, 1])
         with cols[0]:
             st.markdown(f"""
