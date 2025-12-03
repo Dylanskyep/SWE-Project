@@ -19,7 +19,7 @@ if "page" in params:
         st.switch_page("pages/Admin_Dashboard.py")
 
 if st.session_state.page == "welcome":
-    st.markdown(
+    st.markdown( # markwdown written assisted by GPT-5 Copilot
         """
         <style>
        [data-testid="stAppViewContainer"] {
@@ -106,7 +106,8 @@ if st.session_state.page == "welcome":
     )
     
 if st.session_state.page == "userlogin":
-    st.markdown("""
+    st.markdown(# markwdown written assisted by GPT-5 Copilot
+        """
         <style>
         [data-testid="stAppViewContainer"] {
                 color: rgb(138, 156, 140);
@@ -182,7 +183,8 @@ if st.session_state.page == "userlogin":
                     st.success(msg)
             
 if st.session_state.page == "adminlogin":
-    st.markdown("""
+    st.markdown( # markwdown written assisted by GPT-5 Copilot
+        """ 
         <style>
         [data-testid="stAppViewContainer"] {
                 color: rgb(138, 156, 140);

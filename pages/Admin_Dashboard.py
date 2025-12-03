@@ -24,7 +24,8 @@ admin_name = st.session_state.get("user_name", "")
 admin_email = st.session_state.get("user_email", "")
 
 st.set_page_config(layout="wide", initial_sidebar_state="collapsed")
-st.markdown("""
+st.markdown( # markwdown written assisted by GPT-5 Copilot
+"""
 <style>
 /* overall page background + font + top spacing */
 [data-testid="stAppViewContainer"] {

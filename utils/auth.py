@@ -22,7 +22,7 @@ def create_user(name: str, email: str, password: str, role: str, admin_key: str 
     })
     return True, "User created successfully"
 
-def login_user(email: str, password: str, role: str = None):
+def login_user(email: str, password: str, role: str = None): #written assisted by GPT-5 Copilot
     """
     Return user dict on successful login or None on failure
     If role is provided, require the user to have that role.

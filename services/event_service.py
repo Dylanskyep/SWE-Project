@@ -79,7 +79,7 @@ def list_registrations(event_id: str) -> List[Dict]:
     )
     return [r.to_dict() or {} for r in regs]
 
-def register_user(event_id: str, user_id: str, name: str, email: str) -> None:
+def register_user(event_id: str, user_id: str, name: str, email: str) -> None: #register and unregister funcitons written assisted by GPT-5 Copilot
     """Register a user and decrement capacity atomically."""
     db = get_db()
     tx = db.transaction()
