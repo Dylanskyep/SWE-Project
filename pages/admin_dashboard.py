@@ -9,14 +9,23 @@ from services.event_service import (
 )
 
 if "role" not in st.session_state or st.session_state.role != "admin":
-    st.error("Unauthorized access. Please log in as an admin.")
+    try:
+        st.query_params()
+    except Exception:
+        pass
+    try:
+        st.switch_page("iVolunteer.py")
+    except Exception:
+        st.session_state.page = "welcome"
+        st.rerun()
     st.stop()
 
 admin_name = st.session_state.get("user_name", "")
 admin_email = st.session_state.get("user_email", "")
 
 st.set_page_config(layout="wide", initial_sidebar_state="collapsed")
-st.markdown("""
+st.markdown( # markwdown written assisted by GPT-5 Copilot
+"""
 <style>
 /* overall page background + font + top spacing */
 [data-testid="stAppViewContainer"] {
@@ -137,8 +146,15 @@ with header_left:
 with header_right:
     if st.button("Logout"):
         st.session_state.clear()
-        st.session_state.page = "welcome"
-        st.rerun()
+        try:
+            st.query_params()
+        except Exception:
+            pass
+        try:
+            st.switch_page("iVolunteer.py")
+        except Exception:
+            st.session_state.page = "welcome"
+            st.rerun()
 
 st.markdown('<div class="header-divider"></div>', unsafe_allow_html=True)
 st.markdown('<div class="section-header">Create New Event</div>', unsafe_allow_html=True)
