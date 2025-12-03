@@ -10,5 +10,4 @@ except ValueError:
 db = firestore.client()
 
 def get_collection(name):
-    return db.collection(name)
- 
+  return db.collection(name)
